@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Square Root Quiz</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .branding {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .branding-text a {
+            font-size: 0.75em;
+            color: #888;
+            text-decoration: none;
+            letter-spacing: 1px;
+            transition: color 0.2s;
+        }
+        .branding-text a:hover {
+            color: #2563eb;
+        }
+        .linkedin-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: #888;
+            font-size: 0.75em;
+            transition: color 0.2s;
+        }
+        .linkedin-link:hover {
+            color: #0a66c2;
+        }
+        .linkedin-link img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            margin-top: 0;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .hint-btn {
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 16px;
+            padding: 4px 12px;
+            font-size: 0.5em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .hint-btn:hover {
+            background: #e0e0e0;
+            color: #333;
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal {
+            background: white;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            transform: scale(0.9);
+            transition: transform 0.3s;
+        }
+        .modal-overlay.show .modal {
+            transform: scale(1);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .modal-header h2 {
+            margin: 0;
+            color: #333;
+            font-size: 1.3em;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+            padding: 0;
+            line-height: 1;
+        }
+        .modal-close:hover {
+            color: #333;
+        }
+        .modal-content {
+            color: #444;
+            line-height: 1.6;
+        }
+        .modal-content h3 {
+            color: #2563eb;
+            margin: 16px 0 8px 0;
+            font-size: 1.1em;
+        }
+        .modal-content p {
+            margin: 8px 0;
+        }
+        .digit-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+        }
+        .digit-table th, .digit-table td {
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+            text-align: center;
+        }
+        .digit-table th {
+            background: #f5f5f5;
+            font-weight: 600;
+        }
+        .example-box {
+            background: #f0f7ff;
+            border-left: 4px solid #2563eb;
+            padding: 12px 16px;
+            margin: 16px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .example-box strong {
+            color: #2563eb;
+        }
+        .question {
+            font-size: 1.4em;
+            margin: 20px 0;
+            color: #444;
+        }
+        .number {
+            font-weight: bold;
+            color: #2563eb;
+        }
+        .timer {
+            font-size: 1.1em;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            font-size: 1.1em;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+        .buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        button {
+            padding: 12px 24px;
+            font-size: 1em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .submit-btn {
+            background: #2563eb;
+            color: white;
+        }
+        .submit-btn:hover {
+            background: #1d4ed8;
+        }
+        .new-btn {
+            background: #6b7280;
+            color: white;
+        }
+        .new-btn:hover {
+            background: #4b5563;
+        }
+        .reset-btn {
+            background: #dc2626;
+            color: white;
+        }
+        .reset-btn:hover {
+            background: #b91c1c;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        .correct {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .incorrect {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .stats {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #666;
+        }
+        .sparkline-container {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        .sparkline-label {
+            color: #666;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+        .sparkline {
+            height: 80px;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            overflow-x: auto;
+            padding: 10px 0;
+        }
+        .sparkline-bar {
+            width: 8px;
+            min-width: 8px;
+            border-radius: 2px;
+            transition: height 0.3s ease;
+        }
+        .sparkline-bar.correct {
+            background: #22c55e;
+        }
+        .sparkline-bar.incorrect {
+            background: #ef4444;
+        }
+        .no-data {
+            color: #999;
+            font-style: italic;
+            font-size: 0.9em;
+        }
+        .share-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        .share-label {
+            color: #666;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+        .share-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        .share-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px 12px;
+            font-size: 0.85em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            color: white;
+            font-weight: 500;
+            transition: opacity 0.2s;
+            box-sizing: border-box;
+        }
+        .share-btn:hover {
+            opacity: 0.9;
+        }
+        .x-btn {
+            background: #000;
+        }
+        .facebook-btn {
+            background: #1877f2;
+        }
+        .threads-btn {
+            background: #000;
+        }
+        .whatsapp-btn {
+            background: #25d366;
+        }
+        .linkedin-btn {
+            background: #0a66c2;
+        }
+        .reddit-btn {
+            background: #ff4500;
+        }
+        .telegram-btn {
+            background: #0088cc;
+        }
+        .insta-btn {
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+        }
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+        .toast.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="branding">
+        <a href="https://www.linkedin.com/in/sorenburkhart/" target="_blank" class="linkedin-link">
+            <img src="data:image/webp;base64,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" alt="Soren Burkhart">
+            <span>Soren Burkhart</span>
+        </a>
+        <div class="branding-text">
+            <a href="https://www.sorenburkhart.com" target="_blank">SOREN BURKHART CONSULTING</a>
+        </div>
+    </div>
+    <div class="card">
+        <h1>Square Root Quiz <button class="hint-btn" onclick="showHint()">Learn the trick!</button></h1>
+        <p class="question">What is the square root of <span class="number" id="squared-number"></span>?</p>
+        
+        <div class="timer">Time: <span id="elapsed-time">0.0</span>s</div>
+        
+        <input type="number" id="answer" placeholder="Enter your answer" autofocus>
+        
+        <div class="buttons">
+            <button class="submit-btn" onclick="checkAnswer()">Submit</button>
+            <button class="new-btn" onclick="newQuestion()">New Question</button>
+            <button class="reset-btn" onclick="resetStats()">Reset Stats</button>
+        </div>
+        
+        <div id="result" class="result" style="display: none;"></div>
+        
+        <div class="stats">
+            Score: <span id="correct">0</span> / <span id="total">0</span>
+            <span id="avg-time" style="margin-left: 15px;"></span>
+        </div>
+        
+        <div class="sparkline-container">
+            <div class="sparkline-label">Performance History (green = correct, red = incorrect)</div>
+            <div class="sparkline" id="sparkline">
+                <span class="no-data">No attempts yet</span>
+            </div>
+        </div>
+        
+        <div class="share-section" id="share-section" style="display: none;">
+            <div class="share-label">Share your score:</div>
+            <div class="share-buttons">
+                <button class="share-btn x-btn" onclick="shareToX()">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                    Post
+                </button>
+                <button class="share-btn facebook-btn" onclick="shareToFacebook()">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                    Share
+                </button>
+                <button class="share-btn threads-btn" onclick="shareToThreads()">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.472 12.01v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.59 12c.025 3.086.718 5.496 2.057 7.164 1.43 1.783 3.631 2.698 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.3-1.634-1.75-.192 1.352-.622 2.446-1.284 3.272-.886 1.102-2.14 1.704-3.73 1.79-1.202.065-2.361-.218-3.259-.801-1.063-.689-1.685-1.74-1.752-2.96-.065-1.182.408-2.256 1.332-3.023.873-.725 2.09-1.138 3.447-1.182.949-.03 1.88.085 2.784.169.075-.586.095-1.163.056-1.723-.128-1.839-1.04-2.778-2.787-2.87-1.197-.062-2.217.324-2.86 1.084l-1.59-1.201c.695-.92 1.715-1.553 2.867-1.78.452-.09.927-.134 1.418-.134 1.936 0 3.443.595 4.36 1.72.796.98 1.228 2.337 1.282 4.028.018.576-.018 1.17-.108 1.772.505.193.98.436 1.41.736 1.134.79 1.96 1.855 2.39 3.083.596 1.706.596 4.063-1.466 6.09-1.876 1.846-4.172 2.644-7.24 2.669z"/><path d="M12.463 13.63c-.823.026-1.496.197-1.956.496-.418.272-.634.637-.608 1.027.027.39.278.735.708.972.482.265 1.134.387 1.816.35 1.048-.057 1.87-.422 2.45-1.086.352-.403.6-.904.748-1.502-.69-.1-1.418-.179-2.138-.2-.338-.012-.678-.033-1.02-.057z"/></svg>
+                    Post
+                </button>
+                <button class="share-btn whatsapp-btn" onclick="shareToWhatsApp()">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                    Send
+                </button>
+                <button class="share-btn linkedin-btn" onclick="shareToLinkedIn()">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                    Share
+                </button>
+                <button class="share-btn reddit-btn" onclick="shareToReddit()">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg>
+                    Post
+                </button>
+                <button class="share-btn telegram-btn" onclick="shareToTelegram()">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                    Send
+                </button>
+                <button class="share-btn insta-btn" onclick="shareToInstagram()">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+                    Copy
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="hint-modal" onclick="closeHintOnOverlay(event)">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>💡 How to Solve Square Roots Fast</h2>
+                <button class="modal-close" onclick="closeHint()">&times;</button>
+            </div>
+            <div class="modal-content">
+                <h3>Step 1: Find the Last Digit</h3>
+                <p>Look at the <strong>last digit</strong> of the number. This tells you what the last digit of the answer must be:</p>
+                <table class="digit-table">
+                    <tr><th>If it ends in</th><th>Answer ends in</th></tr>
+                    <tr><td>0</td><td>0</td></tr>
+                    <tr><td>1</td><td>1 or 9</td></tr>
+                    <tr><td>4</td><td>2 or 8</td></tr>
+                    <tr><td>5</td><td>5</td></tr>
+                    <tr><td>6</td><td>4 or 6</td></tr>
+                    <tr><td>9</td><td>3 or 7</td></tr>
+                </table>
+                
+                <h3>Step 2: Find the First Digit</h3>
+                <p><strong>Disregard the last two digits</strong> and look at what remains. Find the largest number whose square is less than or equal to this remainder.</p>
+                
+                <h3>Step 3: Choose High or Low</h3>
+                <p>Multiply that number by the next number up. If the product is <strong>less than or equal to</strong> the remainder, use the <strong>higher</strong> digit from Step 1. Otherwise, use the <strong>lower</strong> one.</p>
+                
+                <div class="example-box">
+                    <strong>Example: √4,356 = ?</strong><br><br>
+                    <strong>Step 1:</strong> Ends in 6 → answer ends in 4 or 6<br><br>
+                    <strong>Step 2:</strong> Remove "56", look at 43. What squared is ≤ 43? That's <strong>6</strong> (since 6² = 36)<br><br>
+                    <strong>Step 3:</strong> 6 × 7 = 42. Is 42 ≤ 43? <strong>Yes!</strong> → Use the higher digit (6)<br><br>
+                    <strong>Answer: 66</strong> ✓
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // UPDATE THIS to your GitHub Pages URL
+        const QUIZ_URL = 'https://sbcllc.github.io/square-root-quiz/index.html';
+        
+        let currentNumber;
+        let correct = 0;
+        let total = 0;
+        let startTime;
+        let timerInterval;
+        let history = []; // Array of {time: seconds, correct: boolean}
+
+        function showHint() {
+            document.getElementById('hint-modal').classList.add('show');
+        }
+
+        function closeHint() {
+            document.getElementById('hint-modal').classList.remove('show');
+        }
+
+        function closeHintOnOverlay(event) {
+            if (event.target === document.getElementById('hint-modal')) {
+                closeHint();
+            }
+        }
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeHint();
+            }
+        });
+
+        function generateQuestion() {
+            // Random number between 21 and 99
+            currentNumber = Math.floor(Math.random() * 79) + 21;
+            const squared = currentNumber * currentNumber;
+            document.getElementById('squared-number').textContent = squared.toLocaleString();
+            document.getElementById('answer').value = '';
+            document.getElementById('result').style.display = 'none';
+            document.getElementById('answer').focus();
+            
+            // Start timer
+            startTime = Date.now();
+            clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimer, 100);
+        }
+
+        function updateTimer() {
+            const elapsed = (Date.now() - startTime) / 1000;
+            document.getElementById('elapsed-time').textContent = elapsed.toFixed(1);
+        }
+
+        function getShareText() {
+            const avgTime = history.length > 0 
+                ? (history.reduce((sum, h) => sum + h.time, 0) / history.length).toFixed(1)
+                : 0;
+            const emoji = correct === total ? '🎯' : correct > total / 2 ? '🧮' : '📚';
+            return `${emoji} I scored ${correct}/${total} on the Square Root Quiz with an avg time of ${avgTime}s! Can you beat me?`;
+        }
+
+        function shareToX() {
+            const text = encodeURIComponent(getShareText());
+            const url = encodeURIComponent(QUIZ_URL);
+            window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
+        }
+
+        function shareToFacebook() {
+            const url = encodeURIComponent(QUIZ_URL);
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${encodeURIComponent(getShareText())}`, '_blank');
+        }
+
+        function shareToThreads() {
+            const text = encodeURIComponent(getShareText() + '\n\n' + QUIZ_URL);
+            window.open(`https://www.threads.net/intent/post?text=${text}`, '_blank');
+        }
+
+        function shareToWhatsApp() {
+            const text = encodeURIComponent(getShareText() + '\n\n' + QUIZ_URL);
+            window.open(`https://wa.me/?text=${text}`, '_blank');
+        }
+
+        function shareToLinkedIn() {
+            const url = encodeURIComponent(QUIZ_URL);
+            const text = encodeURIComponent(getShareText());
+            window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank');
+        }
+
+        function shareToReddit() {
+            const title = encodeURIComponent(getShareText());
+            const url = encodeURIComponent(QUIZ_URL);
+            window.open(`https://www.reddit.com/submit?url=${url}&title=${title}`, '_blank');
+        }
+
+        function shareToTelegram() {
+            const text = encodeURIComponent(getShareText());
+            const url = encodeURIComponent(QUIZ_URL);
+            window.open(`https://t.me/share/url?url=${url}&text=${text}`, '_blank');
+        }
+
+        function shareToInstagram() {
+            // Instagram doesn't support direct sharing via URL, so copy to clipboard
+            const text = `${getShareText()}\n\n${QUIZ_URL}`;
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Copied to clipboard! Paste in your Instagram story or post.');
+            }).catch(() => {
+                showToast('Could not copy. Please copy manually.');
+            });
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function checkAnswer() {
+            const userAnswer = parseInt(document.getElementById('answer').value);
+            const resultDiv = document.getElementById('result');
+            
+            if (isNaN(userAnswer)) {
+                resultDiv.textContent = 'Please enter a number.';
+                resultDiv.className = 'result incorrect';
+                resultDiv.style.display = 'block';
+                return;
+            }
+
+            // Stop timer and calculate elapsed time
+            clearInterval(timerInterval);
+            const elapsedTime = (Date.now() - startTime) / 1000;
+
+            total++;
+            const isCorrect = userAnswer === currentNumber;
+            
+            // Record in history
+            history.push({
+                time: elapsedTime,
+                correct: isCorrect
+            });
+            
+            if (isCorrect) {
+                correct++;
+                resultDiv.innerHTML = `✓ Correct! <span style="font-weight: normal;">(${elapsedTime.toFixed(1)}s)</span>`;
+                resultDiv.className = 'result correct';
+            } else {
+                resultDiv.innerHTML = `✗ Incorrect. The answer was ${currentNumber}. <span style="font-weight: normal;">(${elapsedTime.toFixed(1)}s)</span>`;
+                resultDiv.className = 'result incorrect';
+            }
+            
+            resultDiv.style.display = 'block';
+            document.getElementById('correct').textContent = correct;
+            document.getElementById('total').textContent = total;
+            
+            // Show share buttons after first attempt
+            document.getElementById('share-section').style.display = 'block';
+            
+            updateAverageTime();
+            updateSparkline();
+        }
+
+        function updateAverageTime() {
+            if (history.length === 0) {
+                document.getElementById('avg-time').textContent = '';
+                return;
+            }
+            const avgTime = history.reduce((sum, h) => sum + h.time, 0) / history.length;
+            document.getElementById('avg-time').textContent = `(Avg: ${avgTime.toFixed(1)}s)`;
+        }
+
+        function updateSparkline() {
+            const sparkline = document.getElementById('sparkline');
+            
+            if (history.length === 0) {
+                sparkline.innerHTML = '<span class="no-data">No attempts yet</span>';
+                return;
+            }
+            
+            // Find max time for scaling
+            const maxTime = Math.max(...history.map(h => h.time), 5); // Minimum scale of 5 seconds
+            
+            sparkline.innerHTML = history.map((h, i) => {
+                // Scale height: 10px minimum, 60px maximum
+                const height = Math.max(10, (h.time / maxTime) * 60);
+                const colorClass = h.correct ? 'correct' : 'incorrect';
+                const title = `Attempt ${i + 1}: ${h.time.toFixed(1)}s - ${h.correct ? 'Correct' : 'Incorrect'}`;
+                return `<div class="sparkline-bar ${colorClass}" style="height: ${height}px" title="${title}"></div>`;
+            }).join('');
+        }
+
+        function newQuestion() {
+            generateQuestion();
+        }
+
+        function resetStats() {
+            correct = 0;
+            total = 0;
+            history = [];
+            document.getElementById('correct').textContent = '0';
+            document.getElementById('total').textContent = '0';
+            document.getElementById('avg-time').textContent = '';
+            document.getElementById('result').style.display = 'none';
+            document.getElementById('share-section').style.display = 'none';
+            updateSparkline();
+            generateQuestion();
+        }
+
+        // Allow pressing Enter to submit
+        document.getElementById('answer').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkAnswer();
+            }
+        });
+
+        // Start with first question
+        generateQuestion();
+    </script>
+</body>
+</html>
